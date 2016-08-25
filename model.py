@@ -13,7 +13,7 @@ class Model:
         self._seq_length = 17
         self._is_training = training
 
-        self._input = tf.placeholder(tf.float32, [self._batch_size, self._seq_length, self._vocab_size],
+        self._input = tf.placeholder(tf.float32, [self._batch_size, self._seq_length, 5],
                                      name='input')
         self._labels = tf.placeholder(tf.int32, [self._batch_size, self._seq_length],
                                       name='output')
@@ -22,7 +22,12 @@ class Model:
             # W = tf.Variable(tf.random_normal([self._vocab_size + 1, 3, 1, 32], mean=0, stddev=1), dtype=tf.float32,
             #                 name='conv1_W')
             # b = tf.Variable(tf.zeros([32]), name='conv1_b')
-            input_ = tf.reshape(self._input, [-1, self._vocab_size, self._seq_length, 1])
+            input = tf.reshape(self._input, [-1, 5])
+            input_ = []
+            for i in tf.unpack(input):
+                inp = sum(tf.unpack(tf.to_float(tf.one_hot(tf.to_int64(i), self._vocab_size, 1, 0))))
+                input_.append(inp)
+            input_ = tf.reshape(tf.pack(input_), [-1, self._vocab_size, self._seq_length, 1])
 
             W = tf.get_variable('conv1_W', [self._vocab_size, 3, 1, 32], initializer=tf.random_normal_initializer(),
                                 dtype=tf.float32)
@@ -112,8 +117,9 @@ class Model:
 
 
 if __name__ == '__main__':
-    m = Model()
-    x = np.random.uniform(low=0.5, high=13.3, size=[1, 9579, 17, 1]).astype(np.float32)
+    batch_size = 1
+    m = Model(1)
+    x = np.random.uniform(low=0.5, high=13.3, size=[1, 17, 5]).astype(np.float32)
     with tf.Session() as sess:
         sess.run(tf.initialize_all_variables())
         print(sess.run(m._output, feed_dict={m.input: x}).shape)
