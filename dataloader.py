@@ -12,15 +12,7 @@ class DataLoader(object):
         self._ix_to_word = file['ix_to_word']
         self._vocab = file['vocab']
         self._vocab_size = file['vocab_size']
-
         x, y = file['data']['X'], file['data']['y']
-        for i, batch in enumerate(x):
-            for t, value in enumerate(batch):
-                n_hot = [0] * self._vocab_size
-                for v in value:
-                    n_hot[v] = 1
-                x[i][t] = n_hot
-
         self._data = self._Data(x, y)
         self._data_length = file['data_length']
 
