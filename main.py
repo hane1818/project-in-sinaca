@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import time
 
 import numpy as np
@@ -8,7 +10,7 @@ from model import Model
 
 
 def run_epoch(session, m, data, eval_op, verbose=False):
-    epoch_size = (len(data) // m.batch_size)
+    epoch_size = ((len(data) // m.batch_size) - 1) // m.num_stap
     start_time = time.time()
     costs = 0.0
     iters = 0
@@ -18,9 +20,9 @@ def run_epoch(session, m, data, eval_op, verbose=False):
         cost, state, _ = session.run([m.cost, m.final_state, eval_op],
                                      {m.input: x,
                                       m.label: y,
-                                      m.initial_state: state})
+                                      m.initial_state: np.array(state)})
         costs += cost
-        iters += 1
+        iters += m.num_stap
 
         if verbose and step % (epoch_size // 10) == 10:
             print("%.3f perplexity: %.3f speed: %.0f wps" %
@@ -38,22 +40,28 @@ def main():
     # X, y = train.get_batch(batch_size=100)
     # input = [[[0] * data.vocab_size for j in range(len(X[i]))] for i in range(len(X))]
 
+    print("Constructing models......")
+
     with tf.Graph().as_default(), tf.Session() as sess:
         with tf.variable_scope('model', reuse=None):
             m = Model(training=True, batch_size=batch_size)
 
         with tf.variable_scope('model', reuse=True):
-            mvalid = Model(training=False, batch_size=len(valid_data))
-            mtest = Model(training=False, batch_size=len(test_data))
+            mvalid = Model(training=False, batch_size=batch_size)
+            mtest = Model(training=False, batch_size=batch_size)
 
+        print("Complete!")
+        print("Initialize models......")
         sess.run(tf.initialize_all_variables())
-        saver = tf.train.Saver
+        saver = tf.train.Saver()
         latest_chk = tf.train.latest_checkpoint('chk')
 
         if latest_chk:
             saver.restore(sess, latest_chk)
         else:
             saver.save(sess, 'chk/model-init')
+
+        print("Start training......")
 
         for i in range(max_epoch):
             # print("Epoch: %d Learning rate: %.3f" % (i + 1, sess.run(m.lr)))
@@ -64,6 +72,8 @@ def main():
             print("Epoch: %d Valid Perplexity: %.3f" % (i + 1, valid_perplexity))
             saver.save(sess, 'chk/model', global_step=i)
 
+        print("Complete Training!")
+        print("Start testing......")
         test_perplexity = run_epoch(sess, mtest, test_data, tf.no_op())
         print("Test Perplexity: %.3f" % test_perplexity)
 
