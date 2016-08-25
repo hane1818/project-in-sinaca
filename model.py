@@ -1,15 +1,15 @@
 from __future__ import unicode_literals
 
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
 
 
 class Model:
-    def __init__(self, opt=None, training=False):
+    def __init__(self, batch_size=10, training=False):
         self._max_grad_norm = 10
         self._vocab_size = 9569
         self._rnn_size = 512
-        self._batch_size = 10
+        self._batch_size = batch_size
         self._seq_length = 17
         self._is_training = training
 
@@ -105,6 +105,11 @@ class Model:
     @property
     def cost(self):
         return self._cost
+
+    @property
+    def batch_size(self):
+        return self._batch_size
+
 
 if __name__ == '__main__':
     m = Model()
