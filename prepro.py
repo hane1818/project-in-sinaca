@@ -51,12 +51,17 @@ def main():
 
     data = {'data': {'X': [], 'y': []}, 'data_length': 0,
             'ix_to_word': ix_to_word, 'vocab': vocab, 'vocab_size': vocab_size}
-
+    i = 0
     for w in word_graph:
         for r in raw_data:
             if w['filename'] == r['file_path']:
 
                 candidates = [[0, 0, 0, 0, 0]] + w['candidates']
+                if len(candidates) == 17:
+                    i += 1
+                else:
+                    print(candidates)
+                assert len(candidates) == 17
 
                 for caption in r['captions']:
                     new_caption = re.split('\W', caption.lower())
@@ -66,6 +71,9 @@ def main():
                     new_caption = word_to_ix(new_caption, vocab)
                     while len(new_caption) < len(candidates):
                         new_caption.append(vocab_size - 1)
+                    else:
+                        new_caption = new_caption[:17]
+                    assert len(new_caption) == 17
 
                     data['data']['X'].append(candidates)
                     data['data']['y'].append(new_caption)
