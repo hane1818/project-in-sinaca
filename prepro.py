@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 import json
-
 import re
 
 
@@ -57,12 +56,7 @@ def main():
         for r in raw_data:
             if w['filename'] == r['file_path']:
 
-                # N-hot representation
                 candidates = [[0, 0, 0, 0, 0]] + w['candidates']
-                """new_candidates = [[0 for i in range(vocab_size)] for t in range(len(candidates))]
-                for t, c in enumerate(candidates):
-                    for i in c:
-                        new_candidates[t][i] = 1"""
 
                 for caption in r['captions']:
                     new_caption = re.split('\W', caption.lower())
@@ -73,13 +67,7 @@ def main():
                     while len(new_caption) < len(candidates):
                         new_caption.append(vocab_size - 1)
 
-                    """# One-hot representation
-                    prev_caption = new_caption
-                    new_caption = [[0 for i in range(vocab_size)] for t in range(len(prev_caption))]
-                    for t, c in enumerate(prev_caption):
-                        new_caption[t][c] = 1"""
-
-                    data['data']['X'].append(new_candidates)
+                    data['data']['X'].append(candidates)
                     data['data']['y'].append(new_caption)
                     data['data_length'] += 1
 
