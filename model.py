@@ -115,6 +115,10 @@ class Model:
     def batch_size(self):
         return self._batch_size
 
+    @property
+    def num_stap(self):
+        return self._seq_length
+
 
 if __name__ == '__main__':
     batch_size = 1
