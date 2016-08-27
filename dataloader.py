@@ -14,6 +14,7 @@ class DataLoader(object):
         self._vocab_size = file['vocab_size']
         x, y = file['data']['X'], file['data']['y']
         self._data = self._Data(x, y)
+        self._train = self._val = self._test = self._data
         self._data_length = file['data_length']
 
     def separate_data(self):
