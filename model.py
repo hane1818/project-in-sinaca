@@ -8,45 +8,79 @@ class Model:
     def __init__(self, batch_size=10, training=False):
         self._max_grad_norm = 10
         self._vocab_size = 9569
+        self._filter_size = 200
         self._rnn_size = 512
         self._batch_size = batch_size
         self._seq_length = 17
         self._is_training = training
+        self._candidate_num = 5
 
-        self._input = tf.placeholder(tf.float32, [self._batch_size, self._seq_length, 5],
+        self._input = tf.placeholder(tf.float32, [self._batch_size, self._seq_length, self._candidate_num],
                                      name='input')
         self._labels = tf.placeholder(tf.int32, [self._batch_size, self._seq_length],
                                       name='output')
 
         with tf.variable_scope('cnn'):
-            # W = tf.Variable(tf.random_normal([self._vocab_size + 1, 3, 1, 32], mean=0, stddev=1), dtype=tf.float32,
-            #                 name='conv1_W')
-            # b = tf.Variable(tf.zeros([32]), name='conv1_b')
-            input = tf.reshape(self._input, [-1, 5])
+            input = tf.reshape(self._input, [-1, self._candidate_num])
             input_ = []
             for i in tf.unpack(input):
                 inp = sum(tf.unpack(tf.to_float(tf.one_hot(tf.to_int64(i), self._vocab_size, 1, 0))))
+                # inp = tf.unpack(sum(tf.unpack(tf.to_float(tf.one_hot(tf.to_int64(i), self._vocab_size, 1, 0)))))
+                # inp[inp > 0] = 1
                 input_.append(inp)
             input_ = tf.reshape(tf.pack(input_), [-1, self._vocab_size, self._seq_length, 1])
-
-            W = tf.get_variable('conv1_W', [self._vocab_size, 3, 1, 32], initializer=tf.random_normal_initializer(),
+            self._conv = []
+            W = tf.get_variable('conv1_W', [self._vocab_size, 1, 1, self._filter_size],
+                                initializer=tf.random_normal_initializer(),
                                 dtype=tf.float32)
-            b = tf.get_variable('conv1_b', [32], initializer=tf.zeros_initializer, dtype=tf.float32)
-            conv1 = tf.nn.conv2d(input_, W, padding='SAME', strides=[1, self._vocab_size, 1, 1], name='conv1')
-            self._conv1 = tf.nn.relu(conv1 + b, name='relu1')
+            b = tf.get_variable('conv1_b', [self._filter_size], initializer=tf.zeros_initializer, dtype=tf.float32)
+            conv = tf.nn.conv2d(input_, W, padding='SAME', strides=[1, self._vocab_size, 1, 1], name='conv1')
+            self._conv.append(tf.nn.relu(conv + b, name='relu1'))
 
-            """W = tf.Variable(tf.random_normal([self._vocab_size + 1, 2, 1, 32], mean=0, stddev=1), dtype=tf.float32,
-                            name='conv2_W')
-            b = tf.Variable(tf.zeros([32]), name='conv2_b')"""
-
-            W = tf.get_variable('conv2_W', [self._vocab_size, 2, 1, 32], initializer=tf.random_normal_initializer(),
+            W = tf.get_variable('conv2_W', [self._vocab_size, 2, 1, self._filter_size],
+                                initializer=tf.random_normal_initializer(),
                                 dtype=tf.float32)
-            b = tf.get_variable('conv2_b', [32], initializer=tf.zeros_initializer, dtype=tf.float32)
-            conv2 = tf.nn.conv2d(input_, W, padding='SAME', strides=[1, self._vocab_size, 1, 1], name='conv2')
-            self._conv2 = tf.nn.relu(conv2 + b, name='relu2')
+            b = tf.get_variable('conv2_b', [self._filter_size], initializer=tf.zeros_initializer, dtype=tf.float32)
+            conv = tf.nn.conv2d(input_, W, padding='SAME', strides=[1, self._vocab_size, 1, 1], name='conv2')
+            self._conv.append(tf.nn.relu(conv + b, name='relu2'))
+
+            W = tf.get_variable('conv3_W', [self._vocab_size, 3, 1, self._filter_size],
+                                initializer=tf.random_normal_initializer(),
+                                dtype=tf.float32)
+            b = tf.get_variable('conv3_b', [self._filter_size], initializer=tf.zeros_initializer, dtype=tf.float32)
+            conv = tf.nn.conv2d(input_, W, padding='SAME', strides=[1, self._vocab_size, 1, 1], name='conv3')
+            self._conv.append(tf.nn.relu(conv + b, name='relu3'))
+
+            W = tf.get_variable('conv4_W', [self._vocab_size, 4, 1, self._filter_size],
+                                initializer=tf.random_normal_initializer(),
+                                dtype=tf.float32)
+            b = tf.get_variable('conv4_b', [self._filter_size], initializer=tf.zeros_initializer, dtype=tf.float32)
+            conv = tf.nn.conv2d(input_, W, padding='SAME', strides=[1, self._vocab_size, 1, 1], name='conv4')
+            self._conv.append(tf.nn.relu(conv + b, name='relu4'))
+
+            W = tf.get_variable('conv5_W', [self._vocab_size, 5, 1, self._filter_size],
+                                initializer=tf.random_normal_initializer(),
+                                dtype=tf.float32)
+            b = tf.get_variable('conv5_b', [self._filter_size], initializer=tf.zeros_initializer, dtype=tf.float32)
+            conv = tf.nn.conv2d(input_, W, padding='SAME', strides=[1, self._vocab_size, 1, 1], name='conv5')
+            self._conv.append(tf.nn.relu(conv + b, name='relu5'))
+
+            W = tf.get_variable('conv6_W', [self._vocab_size, 6, 1, self._filter_size],
+                                initializer=tf.random_normal_initializer(),
+                                dtype=tf.float32)
+            b = tf.get_variable('conv6_b', [self._filter_size], initializer=tf.zeros_initializer, dtype=tf.float32)
+            conv = tf.nn.conv2d(input_, W, padding='SAME', strides=[1, self._vocab_size, 1, 1], name='conv6')
+            self._conv.append(tf.nn.relu(conv + b, name='relu6'))
+
+            W = tf.get_variable('conv7_W', [self._vocab_size, 7, 1, self._filter_size],
+                                initializer=tf.random_normal_initializer(),
+                                dtype=tf.float32)
+            b = tf.get_variable('conv7_b', [self._filter_size], initializer=tf.zeros_initializer, dtype=tf.float32)
+            conv = tf.nn.conv2d(input_, W, padding='SAME', strides=[1, self._vocab_size, 1, 1], name='conv7')
+            self._conv.append(tf.nn.relu(conv + b, name='relu7'))
 
         with tf.variable_scope('rnnlm'):
-            next_input = tf.concat(3, [self._conv1, self._conv2])
+            next_input = tf.concat(3, self._conv)
             next_input = tf.reshape(next_input, [self._batch_size, self._seq_length, -1])
             # next_input = tf.reshape(tf.tile(next_input, [1, 5, 1]), [self._batch_size * 5, self._seq_length, -1])
             self._cell = tf.nn.rnn_cell.BasicLSTMCell(self._rnn_size)
@@ -61,8 +95,6 @@ class Model:
 
         output = tf.reshape(tf.concat(1, outputs), [-1, self._rnn_size])
 
-        # W = tf.Variable(tf.truncated_normal([self._rnn_size, self._vocab_size + 1]))
-        # b = tf.Variable(tf.zeros([self._vocab_size + 1]))
         W = tf.get_variable('softmax_W', [self._rnn_size, self._vocab_size],
                             initializer=tf.truncated_normal_initializer(),
                             dtype=tf.float32)
@@ -118,6 +150,10 @@ class Model:
     @property
     def num_stap(self):
         return self._seq_length
+
+    @property
+    def output(self):
+        return self._output
 
 
 if __name__ == '__main__':
