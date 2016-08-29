@@ -30,7 +30,7 @@ def run_epoch(session, m, data, eval_op, verbose=False):
                   (step * 1.0 / epoch_size, np.exp(costs / iters),
                    iters * m.batch_size / (time.time() - start_time)))
 
-    return np.exp(costs)
+    return np.exp(costs / iters)
 
 
 def main():
