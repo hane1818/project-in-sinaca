@@ -8,7 +8,7 @@ class Model:
     def __init__(self, batch_size=10, training=False):
         self._max_grad_norm = 10
         self._vocab_size = 9569
-        self._filter_size = 200
+        self._filter_size = 128
         self._rnn_size = 512
         self._batch_size = batch_size
         self._seq_length = 17
