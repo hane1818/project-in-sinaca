@@ -83,7 +83,7 @@ class Model:
             next_input = tf.concat(3, self._conv)
             next_input = tf.reshape(next_input, [self._batch_size, self._seq_length, -1])
             # next_input = tf.reshape(tf.tile(next_input, [1, 5, 1]), [self._batch_size * 5, self._seq_length, -1])
-            self._cell = tf.nn.rnn_cell.BasicLSTMCell(self._rnn_size)
+            self._cell = tf.nn.rnn_cell.BasicLSTMCell(self._rnn_size, state_is_tuple=True)
             self._initial_state = self._cell.zero_state(batch_size=self._batch_size, dtype=tf.float32)
 
             outputs = []
