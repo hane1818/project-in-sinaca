@@ -21,7 +21,7 @@ def run_epoch(session, m, data, eval_op, verbose=False):
         cost, state, _ = session.run([m.cost, m.final_state, eval_op],
                                      {m.input: x,
                                       m.label: y,
-                                      m.initial_state: np.array(state)})
+                                      m.initial_state: state})
         costs += cost
         iters += 1
 
