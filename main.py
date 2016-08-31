@@ -1,6 +1,7 @@
 from __future__ import division
 from __future__ import print_function
 
+import os
 import time
 
 import numpy as np
@@ -55,6 +56,10 @@ def main():
         print("Complete!")
         print("Initialize models......")
         sess.run(tf.initialize_all_variables())
+        
+        if not os.path.exists('chk/'):
+            os.mkdir('chk')
+
         saver = tf.train.Saver()
         latest_chk = tf.train.latest_checkpoint('chk')
 
