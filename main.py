@@ -15,7 +15,7 @@ def run_epoch(session, m, data, eval_op, verbose=False):
     start_time = time.time()
     costs = 0.0
     iters = 0
-    state = m.initial_state.eval()
+    state = session.run(m.initial_state)
     for step in range(epoch_size):
         x, y = data.get_batch(m.batch_size)
         cost, state, _ = session.run([m.cost, m.final_state, eval_op],
@@ -34,8 +34,8 @@ def run_epoch(session, m, data, eval_op, verbose=False):
 
 
 def main():
-    batch_size = 20
-    max_epoch = 5000
+    batch_size = 1000
+    max_epoch = 1
     data = DataLoader()
     train_data = data.train
     # train_data, valid_data, test_data = data.separate_data()
