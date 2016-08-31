@@ -35,7 +35,7 @@ def run_epoch(session, m, data, eval_op, verbose=False):
 
 def main():
     batch_size = 1000
-    max_epoch = 1
+    max_epoch = 5000
     data = DataLoader()
     train_data = data.train
     # train_data, valid_data, test_data = data.separate_data()
@@ -55,7 +55,7 @@ def main():
         print("Complete!")
         print("Initialize models......")
         sess.run(tf.initialize_all_variables())
-        saver = tf.train.Saver(max_to_keep=max_epoch)
+        saver = tf.train.Saver()
         latest_chk = tf.train.latest_checkpoint('chk')
 
         if latest_chk:

@@ -8,7 +8,7 @@ class Model:
     def __init__(self, batch_size=10, training=False):
         self._max_grad_norm = 10
         self._vocab_size = 9569
-        self._filter_size = 100
+        self._filter_size = 200
         self._rnn_size = 512
         self._batch_size = batch_size
         self._seq_length = 17
@@ -65,7 +65,7 @@ class Model:
             conv = tf.nn.conv2d(input_, W, padding='SAME', strides=[1, self._vocab_size, 1, 1], name='conv5')
             self._conv.append(tf.nn.relu(conv + b, name='relu5'))
 
-            """W = tf.get_variable('conv6_W', [self._vocab_size, 6, 1, self._filter_size],
+            W = tf.get_variable('conv6_W', [self._vocab_size, 6, 1, self._filter_size],
                                 initializer=tf.random_normal_initializer(),
                                 dtype=tf.float32)
             b = tf.get_variable('conv6_b', [self._filter_size], initializer=tf.zeros_initializer, dtype=tf.float32)
@@ -77,7 +77,7 @@ class Model:
                                 dtype=tf.float32)
             b = tf.get_variable('conv7_b', [self._filter_size], initializer=tf.zeros_initializer, dtype=tf.float32)
             conv = tf.nn.conv2d(input_, W, padding='SAME', strides=[1, self._vocab_size, 1, 1], name='conv7')
-            self._conv.append(tf.nn.relu(conv + b, name='relu7'))"""
+            self._conv.append(tf.nn.relu(conv + b, name='relu7'))
 
         with tf.variable_scope('rnnlm'):
             next_input = tf.concat(3, self._conv)
